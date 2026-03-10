@@ -1,0 +1,60 @@
+# A fast way to convert a jupyter notebook into a report (html format).
+# command: docker compose exec app quarto render notebooks/environment_test.ipynb --to html --embed-resources --output-dir /app/reports
+
+# A way to check if your docker container is running python
+# docker exec <container_name> python --version
+
+# Common git commands
+# git pull # Updates your clone
+# git log --online # Shows logged history
+# git branch branch-name # Creates a new branch from current branch
+# git checkout branch-name # Switches into branch
+# git push origin branch-name # Request to merge branch
+
+DVC CHEAT SHEET
+===============
+
+INITIAL SETUP
+  git init
+  dvc init
+  git add .dvc .dvcignore
+  git commit -m "Initialize Git and DVC"
+
+TRACK NEW DATA
+  dvc add path/to/data
+  git add path/to/data.dvc path/to/.gitignore
+  git commit -m "Track data with DVC"
+  git push
+
+UPDATE TRACKED DATA (after changes)
+  dvc add path/to/data
+  git add path/to/data.dvc
+  git commit -m "Update data"
+  git push
+
+REVERT TO PREVIOUS VERSION
+  git log --oneline                              # find the commit hash
+  git checkout <commit> -- path/to/data.dvc      # restore old .dvc file
+  dvc checkout                                   # restore actual data
+  git add path/to/data.dvc                       # commit the revert
+  git commit -m "Revert data to previous version"
+  git push
+
+CHECK STATUS
+  dvc status                  # see if tracked data has changed
+  cat path/to/data.dvc       # see the hash DVC is tracking
+  cat path/to/.gitignore     # confirm Git is ignoring the data
+  git status                  # check Git side of things
+
+REMOTE (once IT confirms Box)
+  dvc remote add -d myremote webdav://dav.box.com/dav/your/folder/path
+  dvc remote modify --local myremote user "your-email"
+  dvc remote modify --local myremote password "your-password"
+  git add .dvc/config
+  git commit -m "Add DVC remote"
+  dvc push                    # upload data to remote
+  dvc pull                    # download data from remote
+
+REMOVE DATA FROM GIT (if accidentally committed)
+  git rm -r --cached path/to/data
+  git commit -m "Remove data from Git tracking"
