@@ -1,0 +1,4 @@
+[core]
+    remote = box
+['remote "box"']
+    url = /Users/daniel/Library/CloudStorage/Box-Box/Projects/sqlite_database_mock_v2/data
