@@ -70,8 +70,7 @@ We use DVC (Data Version Control) to version the registry database, allowing us 
 <summary><h2>Project Structure</h2></summary>
 
 ```
-src/
-├── __init__.py
+project/
 ├── data/
 │   ├── raw/
 │   │   ├── irb_2025_001/
@@ -92,7 +91,7 @@ src/
 │   ├── setup_registry.py
 │   ├── connections.yaml
 │   └── README_data_dictionary.md
-├── scripts/
+├── src/
 │   ├── generate_mock_data.py
 │   ├── ehr_parser/
 │   ├── ingest_batch.py
