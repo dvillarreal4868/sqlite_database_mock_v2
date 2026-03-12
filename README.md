@@ -15,18 +15,18 @@ We use DVC (Data Version Control) to version the registry database, allowing us 
 <details>
 <summary><strong>Phase 1: Initial Setup</strong></summary>
 
-- [ ] 1.1 — Initialize the project repository
-- [ ] 1.2 — Initialize DVC
-- [ ] 1.3 — Create the database and define the schema
-- [ ] 1.4 — Version the empty database with DVC
+- [X] 1.1 — Initialize the project repository
+- [x] 1.2 — Initialize DVC
+- [x] 1.3 — Create the database and define the schema
+- [x] 1.4 — Version the empty database with DVC
 
 </details>
 
 <details>
 <summary><strong>Phase 2: First Data Arrival (IRB 1 & IRB 2)</strong></summary>
 
-- [ ] 2.1 — Generate mock data for IRB 1 and IRB 2
-- [ ] 2.2 — Parse the raw data into a dataframe
+- [x] 2.1 — Generate mock data for IRB 1 and IRB 2
+- [x] 2.2 — Parse the raw data into a dataframe
 - [ ] 2.3 — Populate the patient_registry table
 - [ ] 2.4 — Populate the data_assets table
 - [ ] 2.5 — Run your first completeness report
@@ -94,7 +94,7 @@ src/
 │   └── README_data_dictionary.md
 ├── scripts/
 │   ├── generate_mock_data.py
-│   ├── ehr_parser.py
+│   ├── ehr_parser/
 │   ├── ingest_batch.py
 │   └── completeness_report.py
 ├── tests/
