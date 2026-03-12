@@ -96,6 +96,11 @@ project/
 │   ├── ehr_parser/
 │   ├── ingest_batch.py
 │   └── completeness_report.py
+├── notebooks/
+│   ├── 00_explore.ipynb
+│   ├── 01_generate_mock_data.ipynb
+│   ├── 02_generate_enroll_patients_scr.ipynb
+│   └── 03_make_registry.ipynb
 ├── tests/
 │   └── test_ingestion.py
 ├── requirements.txt
