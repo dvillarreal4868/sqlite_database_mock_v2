@@ -17,8 +17,8 @@ We use DVC (Data Version Control) to version the registry database, allowing us 
 
 - [X] 1.1 — Initialize the project repository
 - [x] 1.2 — Initialize DVC
-- [x] 1.3 — Create the database and define the schema
-- [x] 1.4 — Version the empty database with DVC
+- [ ] 1.3 — Create the database and define the schema
+- [ ] 1.4 — Version the empty database with DVC
 
 </details>
 
@@ -92,7 +92,6 @@ project/
 │   ├── connections.yaml
 │   └── README_data_dictionary.md
 ├── src/
-│   ├── generate_mock_data.py
 │   ├── ehr_parser/
 │   ├── ingest_batch.py
 │   └── completeness_report.py
