@@ -214,3 +214,11 @@ __marimo__/
 _site/
 _book/
 /.quarto/
+
+# Registry
+registry.db
+*.db
+
+# Data
+data/raw
+data/processed
