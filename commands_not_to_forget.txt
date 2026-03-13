@@ -4,12 +4,37 @@
 # A way to check if your docker container is running python
 # docker exec <container_name> python --version
 
-# Common git commands
-# git pull # Updates your clone
-# git log --online # Shows logged history
-# git branch branch-name # Creates a new branch from current branch
-# git checkout branch-name # Switches into branch
-# git push origin branch-name # Request to merge branch
+GIT BRANCHING WORKFLOW
+=====================
+
+STARTING A NEW BRANCH
+  git checkout main                        # make sure you're on main first
+  git pull                                 # get latest changes
+  git checkout -b branch-name              # create AND switch into new branch
+  git push -u origin branch-name           # push branch to remote & set upstream
+                                           # (after this, plain "git push" works)
+
+DO YOUR WORK (repeat as needed)
+  git add .                                # stage all changes
+  git commit -m "Describe what you did"    # commit
+  git push                                 # push to remote (upstream already set)
+
+MERGE BRANCH INTO MAIN
+  git checkout main                        # switch back to main
+  git pull                                 # get any updates from others
+  git merge branch-name                    # merge your branch into main
+  git push                                 # push the updated main to remote
+
+DELETE THE BRANCH (after merge)
+  git branch -d branch-name               # delete local branch
+  git push origin --delete branch-name     # delete remote branch
+
+USEFUL EXTRAS
+  git branch                               # list local branches
+  git branch -a                            # list all branches (local + remote)
+  git log --oneline                        # compact commit history
+  git stash                                # temporarily shelve uncommitted changes
+  git stash pop                            # bring back stashed changes
 
 DVC CHEAT SHEET
 ===============
