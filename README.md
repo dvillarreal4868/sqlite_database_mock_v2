@@ -99,7 +99,8 @@ project/
 │   ├── 00_explore.ipynb
 │   ├── 01_generate_mock_data.ipynb
 │   ├── 02_generate_enroll_patients_scr.ipynb
-│   └── 03_make_registry.ipynb
+│   ├── 03_make_registry.ipynb
+│   └── 04_generate_mock_data_v2.ipynb
 ├── tests/
 │   └── test_ingestion.py
 ├── requirements.txt
