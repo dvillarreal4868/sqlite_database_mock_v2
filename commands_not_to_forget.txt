@@ -65,6 +65,26 @@ REVERT TO PREVIOUS VERSION
   git commit -m "Revert data to previous version"
   git push
 
+PEEK AT OLD DATA (without committing anything)
+  git log --oneline                              # find the old commit hash
+  git checkout <commit> -- path/to/data.dvc      # grab the old .dvc file
+  dvc checkout                                   # restores the actual old data
+  # ... look at / test your old data ...
+  git checkout HEAD -- path/to/data.dvc          # restore current .dvc file
+  dvc checkout                                   # restores your current data
+  #
+  # Example with real values:
+  #   git checkout a3f7b2c -- data/my_dataset.csv.dvc
+  #   dvc checkout
+  #   (inspect your old data)
+  #   git checkout HEAD -- data/my_dataset.csv.dvc
+  #   dvc checkout
+  #
+  # NOTE: <commit> = the hash from git log, path/to/data.dvc = wherever
+  #       your actual .dvc file lives (e.g. data/my_dataset.csv.dvc).
+  #       Unlike REVERT above, you never git add/commit here —
+  #       you're just peeking and snapping back.
+
 CHECK STATUS
   dvc status                  # see if tracked data has changed
   cat path/to/data.dvc       # see the hash DVC is tracking
