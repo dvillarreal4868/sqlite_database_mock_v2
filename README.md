@@ -30,7 +30,8 @@ We use DVC (Data Version Control) to version the registry database, allowing us 
 - [ ] 2.3 — Populate the patient_registry table
 - [ ] 2.4 — Populate the data_assets table
 - [ ] 2.5 — Run your first completeness report
-- [ ] 2.6 — Version the populated database with DVC
+- [ ] 2.6 — Consolidate raw data into HDF5 files
+- [ ] 2.7 — Version the populated database with DVC
 
 </details>
 
@@ -42,7 +43,8 @@ We use DVC (Data Version Control) to version the registry database, allowing us 
 - [ ] 3.3 — Ingest IRB 3 into the registry
 - [ ] 3.4 — Reconciliation report
 - [ ] 3.5 — Decide on and implement backfill strategy
-- [ ] 3.6 — Version the updated database with DVC
+- [ ] 3.6 — Consolidate updated data into HDF5 files
+- [ ] 3.7 — Version the updated database with DVC
 
 </details>
 
@@ -86,6 +88,9 @@ project/
 │   │       ├── ct/
 │   │       └── mri/
 │   └── processed/
+│       ├── irb_2025_001.h5
+│       ├── irb_2025_002.h5
+│       └── irb_2025_003.h5
 ├── db/
 │   ├── registry.db
 │   ├── setup_registry.py
@@ -94,6 +99,7 @@ project/
 ├── src/
 │   ├── ehr_parser/
 │   ├── ingest_batch.py
+│   ├── consolidate_h5.py
 │   └── completeness_report.py
 ├── notebooks/
 │   ├── 00_explore.ipynb
@@ -115,7 +121,7 @@ project/
 <summary><h2>Prerequisites</h2></summary>
 
 - Python 3.9+
-- pip packages: `pandas`, `pyyaml`, `dvc` (see `requirements.txt`)
+- pip packages: `pandas`, `pyyaml`, `h5py`, `dvc` (see `requirements.txt`)
 - A basic understanding of SQL (SELECT, INSERT, UPDATE)
 - DVC installed and initialized in the repo
 
@@ -237,7 +243,22 @@ project/
 </details>
 
 <details>
-<summary><strong>Step 2.6 — Version the populated database with DVC</strong></summary>
+<summary><strong>Step 2.6 — Consolidate raw data into HDF5 files</strong></summary>
+
+- Write or extend `scripts/consolidate_h5.py` to gather all raw data for a given IRB and pack it into a single `.h5` file under `data/processed/`.
+- For each IRB directory (IRB 1 and IRB 2), the script should:
+  - Create an HDF5 file named after the IRB (e.g., `data/processed/irb_2025_001.h5`).
+  - Store EHR records as a dataset (e.g., a pandas DataFrame written via `pd.DataFrame.to_hdf()` or structured datasets via `h5py`).
+  - Store imaging asset paths (or the imaging data itself, if file sizes allow) under modality-specific groups (`/ct/`, `/mri/`).
+  - Attach metadata attributes to the root group: `irb_id`, `patient_count`, `created_date`, and `consolidation_version`.
+- Only consolidate records with `status = "complete"` in the registry. Pending assets should be skipped — they'll be picked up in future consolidation runs once the data arrives.
+- After writing, verify each `.h5` file by reopening it and asserting group structure and dataset shapes match what the registry reports.
+- Add `data/processed/*.h5` to `.gitignore` — these are derived artifacts and should not live in git. Optionally track them with DVC if downstream consumers need versioned access.
+
+</details>
+
+<details>
+<summary><strong>Step 2.7 — Version the populated database with DVC</strong></summary>
 
 - Run `dvc add db/registry.db`.
 - Run `git add db/registry.db.dvc && git commit -m "Registry after IRB 1 and IRB 2 ingestion"`.
@@ -311,7 +332,20 @@ project/
 </details>
 
 <details>
-<summary><strong>Step 3.6 — Version the updated database with DVC</strong></summary>
+<summary><strong>Step 3.6 — Consolidate updated data into HDF5 files</strong></summary>
+
+- Re-run `scripts/consolidate_h5.py` across all three IRBs. This regenerates the `.h5` files under `data/processed/` to reflect the current state of the registry.
+- IRB 1 and IRB 2 files may have changed if the backfill strategy in Step 3.5 upgraded any pending records to complete. The script should overwrite the existing `.h5` files with the updated data.
+- The new `data/processed/irb_2025_003.h5` file should contain all 10 patients × 3 modalities since IRB 3 arrived with complete data.
+- Verify the consolidated files:
+  - Reopen each `.h5` and confirm dataset shapes and group structure.
+  - Cross-reference patient counts and modality completeness against the reconciliation report from Step 3.4.
+- If you're tracking the `.h5` files with DVC, run `dvc add data/processed/*.h5` alongside the database versioning in the next step.
+
+</details>
+
+<details>
+<summary><strong>Step 3.7 — Version the updated database with DVC</strong></summary>
 
 - Run `dvc add db/registry.db`.
 - Run `git add db/registry.db.dvc && git commit -m "Registry after IRB 3 ingestion"`.
@@ -380,7 +414,7 @@ project/
   - **Checking data completeness**: run the completeness report script.
   - **Recovering from a bad ingestion**: use `dvc checkout` to roll back to the previous version of `registry.db`, fix the issue, re-ingest.
   - **Adding a new modality**: update the CHECK constraint in the schema, update the parser, re-run setup (the IF NOT EXISTS clauses make this safe).
-  - **Rebuilding the database from scratch**: delete `registry.db`, run `setup_registry.py`, re-ingest all IRBs in order.
+  - **Rebuilding the database from scratch**: delete `registry.db`, run `setup_registry.py`, re-ingest all IRBs in order, then re-run `consolidate_h5.py` to regenerate the HDF5 files.
 
 </details>
 
@@ -397,7 +431,8 @@ project/
 1. Place the new IRB directory in `data/raw/`.
 2. Run `python scripts/ingest_batch.py --irb-dir data/raw/irb_2025_XXX`.
 3. Run `python scripts/completeness_report.py` to verify.
-4. Version: `dvc add db/registry.db && git add db/registry.db.dvc && git commit -m "Ingested IRB-2025-XXX" && dvc push`.
+4. Run `python scripts/consolidate_h5.py` to regenerate HDF5 files in `data/processed/`.
+5. Version: `dvc add db/registry.db && git add db/registry.db.dvc && git commit -m "Ingested IRB-2025-XXX" && dvc push`.
 
 </details>
 
@@ -413,7 +448,7 @@ project/
 
 1. Check the `change_log` table to understand what happened and when.
 2. If the database is corrupted: `dvc checkout db/registry.db` to restore the last good version.
-3. If you need to rebuild entirely: delete `registry.db`, run `setup_registry.py`, re-ingest all IRBs chronologically.
+3. If you need to rebuild entirely: delete `registry.db`, run `setup_registry.py`, re-ingest all IRBs chronologically, and re-run `consolidate_h5.py`.
 
 </details>
 
@@ -456,5 +491,6 @@ project/
 - **Pending rows are created at enrollment.** When a patient is enrolled, rows for all expected modalities are created immediately — even before the data exists. This lets us query for what's missing, not just what's present.
 - **The change log is append-only and trigger-driven.** No one needs to remember to log changes. The database handles it automatically.
 - **DVC versions the database, not git.** The database is a binary file that changes frequently. Git would bloat; DVC handles this efficiently with deduplication and remote storage.
+- **Consolidated HDF5 files are derived artifacts.** The `.h5` files in `data/processed/` are regenerated from the raw data guided by the registry's completeness status. They are not the source of truth — the registry and raw files are. This means `.h5` files can always be rebuilt from scratch, and only records marked `"complete"` in the registry are included.
 
 </details>
